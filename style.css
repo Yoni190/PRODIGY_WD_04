@@ -6,15 +6,21 @@
 .weatherInfo, body, .up, .value, .tempInfo, .container, .followingDays {
     display: flex;
 }
+input, .container, .followingDays {
+    border-radius: 13px;
+    padding: 13px;
+}
 body {
     flex-direction: column;
     align-items: center;
     background-image: url("weather-app.avif");
     background-size: cover;
+    background-repeat: no-repeat;
 }
 input {
     height: 40px;
     width: 500px;
+    border-radius: 10px;
 }
 .searchButton {
     width: 40px;
@@ -23,7 +29,6 @@ input {
     
 }
 .container {
-    padding: 10px;
     margin-top: 20px;
     width: 700px;
     height: 600px;
@@ -47,14 +52,13 @@ input {
 .tempInfo {
     gap: 10px;
     font-size: 24px;
-    padding: 15px;
+    padding: 10px;
 }
 .value {
     justify-content: center;
 }
 .followingDays {
     border-radius: 10px;
-    padding: 10px;
 }
 @media (max-width: 700px) {
     .container {

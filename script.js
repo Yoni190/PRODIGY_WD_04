@@ -23,6 +23,8 @@ let fiveDaysTemp = [document.querySelector(".day1 .temp"), document.querySelecto
 let fiveDaysDate = [document.querySelector(".day1 .date"), document.querySelector(".day2 .date"), document.querySelector(".day3 .date"), document.querySelector(".day4 .date"), document.querySelector(".day5 .date")];
 let fiveDaysIcon = [document.querySelector(".day1 .icon"), document.querySelector(".day2 .icon"), document.querySelector(".day3 .icon"), document.querySelector(".day4 .icon"), document.querySelector(".day5 .icon")];
 
+let first = false;
+
 
 
 function fetchAPI(apiURL){
@@ -47,13 +49,15 @@ function fetchAPI(apiURL){
     });
 }
 
+
+
 function getLoc(){
     if("geolocation" in navigator){
         navigator.geolocation.getCurrentPosition((position) => {
             const lat = position.coords.latitude;
             const lon = position.coords.longitude;
 
-           const coordinateAPI = `https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/${lat},${lon}?unitGroup=us&key=${apiKey}`
+           const coordinateAPI = `https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/${lat},${lon}?unitGroup=us&key=${apiKey}`;
            fetchAPI(coordinateAPI);
         })
     }
@@ -62,9 +66,8 @@ function getLoc(){
 
 
 function processData(response){
-    console.log(response);
-    const days = response.days;
     const location = document.createTextNode(response.resolvedAddress);
+    const days = response.days;
     const date = document.createTextNode(response.days[0].datetime);
     const temp = document.createTextNode(`${to_Celsius(response.currentConditions.temp)} C`);
     const description = document.createTextNode(response.description);
@@ -103,6 +106,7 @@ function processData(response){
         fiveDaysIcon[i].appendChild(nextImg);
     }
 
+    first = true;
 }
 
 function getImage(conditionIcon, img) {
