@@ -17,12 +17,17 @@ let tempName1 = document.querySelector(".humidity");
 let tempName2 = document.querySelector(".sunrise");
 let tempName3 = document.querySelector(".sunset");
 let icon = document.querySelector(".icon");
+let fDays = document.querySelector(".followingDays");
+let day = document.querySelector(".day");
+let fiveDaysTemp = [document.querySelector(".day1 .temp"), document.querySelector(".day2 .temp"), document.querySelector(".day3 .temp"), document.querySelector(".day4 .temp"), document.querySelector(".day5 .temp")];
+let fiveDaysDate = [document.querySelector(".day1 .date"), document.querySelector(".day2 .date"), document.querySelector(".day3 .date"), document.querySelector(".day4 .date"), document.querySelector(".day5 .date")];
+let fiveDaysIcon = [document.querySelector(".day1 .icon"), document.querySelector(".day2 .icon"), document.querySelector(".day3 .icon"), document.querySelector(".day4 .icon"), document.querySelector(".day5 .icon")];
 
-let first = true;
 
 
-function fetchAPI(cityName){
-    const weatherAPIUrl = new URL(`https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/${cityName}?unitGroup=us&key=${apiKey}&contentType=json`);
+function fetchAPI(apiURL){
+    styleContainer();
+    const weatherAPIUrl = apiURL;
     fetch(weatherAPIUrl, {
         "method": "GET",
         "headers": {
@@ -42,8 +47,23 @@ function fetchAPI(cityName){
     });
 }
 
+function getLoc(){
+    if("geolocation" in navigator){
+        navigator.geolocation.getCurrentPosition((position) => {
+            const lat = position.coords.latitude;
+            const lon = position.coords.longitude;
+
+           const coordinateAPI = `https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/${lat},${lon}?unitGroup=us&key=${apiKey}`
+           fetchAPI(coordinateAPI);
+        })
+    }
+}
+
+
 
 function processData(response){
+    console.log(response);
+    const days = response.days;
     const location = document.createTextNode(response.resolvedAddress);
     const date = document.createTextNode(response.days[0].datetime);
     const temp = document.createTextNode(`${to_Celsius(response.currentConditions.temp)} C`);
@@ -53,6 +73,39 @@ function processData(response){
     const sunset = document.createTextNode(response.currentConditions.sunset);
     const conditionIcon = response.currentConditions.icon;
     const img = document.createElement("img");
+    img.src = getImage(conditionIcon, img);
+    
+    img.style.height = "100px";
+    img.style.width = "100px";
+
+    location_div.appendChild(location);
+    date_div.appendChild(date);
+    temp_div.appendChild(temp);
+    temp_div.innerHTML += "<br>";
+    temp_div.appendChild(description);
+    tempValue1.appendChild(humidity);
+    tempValue2.appendChild(sunrise);
+    tempValue3.appendChild(sunset);
+    icon.appendChild(img);
+
+    tempName1.appendChild(document.createTextNode("Humidity"));
+    tempName2.appendChild(document.createTextNode("Sunrise"));
+    tempName3.appendChild(document.createTextNode("Sunset"));
+
+    for(let i = 0; i < days.length; i++){
+        const nextImg = document.createElement("img");
+        const nextConditionIcon = days[i].icon;
+        nextImg.src = getImage(nextConditionIcon, nextImg);
+        nextImg.style.height = "50px";
+        nextImg.style.width = "50px";
+        fiveDaysTemp[i].appendChild(document.createTextNode(to_Celsius(days[i].temp)));
+        fiveDaysDate[i].appendChild(document.createTextNode(days[i].datetime));
+        fiveDaysIcon[i].appendChild(nextImg);
+    }
+
+}
+
+function getImage(conditionIcon, img) {
     switch(conditionIcon){
         case "snow":
             img.src = "img/snow.png";
@@ -106,23 +159,7 @@ function processData(response){
             img.src = "img/wind.png";
             break;
     }
-    img.style.height = "100px";
-    img.style.width = "100px";
-
-    location_div.appendChild(location);
-    date_div.appendChild(date);
-    temp_div.appendChild(temp);
-    temp_div.innerHTML += "<br>";
-    temp_div.appendChild(description);
-    tempValue1.appendChild(humidity);
-    tempValue2.appendChild(sunrise);
-    tempValue3.appendChild(sunset);
-    icon.appendChild(img);
-
-    tempName1.appendChild(document.createTextNode("Humidity"));
-    tempName2.appendChild(document.createTextNode("Sunrise"));
-    tempName3.appendChild(document.createTextNode("Sunset"));
-
+    return img.src;
 }
 
 function to_Celsius(fahrenheit) {
@@ -140,6 +177,11 @@ function clearWeatherInfo(){
     tempName1.textContent = "";
     tempName2.textContent = "";
     tempName3.textContent = "";
+    for(let i = 0; i < 5; i++){
+        fiveDaysDate[i].textContent = "";
+        fiveDaysIcon[i].textContent = "";
+        fiveDaysTemp[i].textContent = "";
+    }
 }
 
 
@@ -152,15 +194,18 @@ input.addEventListener("keydown", (e) => {
     }
 })
 
-function displayWeatherInfo(){
-    if (!first) {
-        clearWeatherInfo();
-    }
-    first = false;
+function styleContainer(){
     container.style.border = "1px solid black";
     container.style.backgroundColor = "lightblue";
     tempInfo.style.border = "2px solid black";
     weatherInfo.style.borderTop = "2px solid black";
+    fDays.style.border = "2px solid black";
     tempInfo.style.borderRadius = "10px";
-    fetchAPI(input.value);
 }
+
+function displayWeatherInfo(){
+    clearWeatherInfo();
+    
+    fetchAPI(`https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/${input.value}?unitGroup=us&key=${apiKey}&contentType=json`);
+}
+getLoc();
