@@ -27,7 +27,7 @@ let first = false;
 
 
 
-function fetchAPI(apiURL){
+function fetchAPI(apiURL, coor = 0){
     styleContainer();
     const weatherAPIUrl = apiURL;
     fetch(weatherAPIUrl, {
@@ -42,7 +42,7 @@ function fetchAPI(apiURL){
         }
         return response.json();
     }).then(response => {
-        processData(response);
+        processData(response, coor);
     })
     .catch(err => {
         console.log(err);
@@ -51,22 +51,31 @@ function fetchAPI(apiURL){
 
 
 
-function getLoc(){
+function getUserLocation(){
     if("geolocation" in navigator){
         navigator.geolocation.getCurrentPosition((position) => {
             const lat = position.coords.latitude;
             const lon = position.coords.longitude;
 
            const coordinateAPI = `https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/${lat},${lon}?unitGroup=us&key=${apiKey}`;
-           fetchAPI(coordinateAPI);
+           fetchAPI(coordinateAPI, 1);
+
         })
     }
 }
 
 
 
-function processData(response){
-    const location = document.createTextNode(response.resolvedAddress);
+
+function processData(response, coor){
+    console.log(response.timezone);
+    let location = "";
+    if(coor == 1){
+        location = document.createTextNode(response.timezone);
+    }
+    else {
+        location = document.createTextNode(response.resolvedAddress);
+    }
     const days = response.days;
     const date = document.createTextNode(response.days[0].datetime);
     const temp = document.createTextNode(`${to_Celsius(response.currentConditions.temp)} C`);
@@ -212,4 +221,4 @@ function displayWeatherInfo(){
     
     fetchAPI(`https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/${input.value}?unitGroup=us&key=${apiKey}&contentType=json`);
 }
-getLoc();
+getUserLocation();
