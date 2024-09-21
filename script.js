@@ -110,8 +110,8 @@ function processData(response, coor){
         nextImg.src = getImage(nextConditionIcon, nextImg);
         nextImg.style.height = "50px";
         nextImg.style.width = "50px";
-        fiveDaysTemp[i].appendChild(document.createTextNode(to_Celsius(days[i].temp)));
-        fiveDaysDate[i].appendChild(document.createTextNode(days[i].datetime));
+        fiveDaysTemp[i].appendChild(document.createTextNode(to_Celsius(days[i+1].temp)));
+        fiveDaysDate[i].appendChild(document.createTextNode(days[i+1].datetime));
         fiveDaysIcon[i].appendChild(nextImg);
     }
 
